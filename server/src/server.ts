@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import dotenv from 'dotenv';
 import cors from 'cors';
+import {Stories} from './routes/story';
 import {Users} from './routes/users';
 
 
@@ -22,6 +23,7 @@ app.get('/', function (req: Request, res: Response) {
 })
 
 app.use('/users', Users);
+app.use('/story', Stories);
 
 
 app.listen(3000, function () {
