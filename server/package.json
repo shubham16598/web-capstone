@@ -5,12 +5,11 @@
   "main": "server.ts",
   "scripts": {
     "build": "tsc --esModuleInterop src/server.ts --outDir ./dist",
-    "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess 'node ./dist/server.js'",
-    "start": "npm run build && cross-env NODE_ENV=dev DEBUG=app:* node ./dist/server.js",
-    "start:prod": "npm run build && npm run minify && cross-env NODE_ENV=dev DEBUG=app:main,app:endpoint node ./dist/server.js",
+    "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess 'node ./dist/src/server.js'",
+    "start": "npm run build && cross-env NODE_ENV=dev DEBUG=app:* node ./dist/src/server.js",
     "db:create": "cross-env NODE_ENV=dev db-migrate up",
     "db:destroy": "cross-env NODE_ENV=dev db-migrate reset",
-    "test": "cross-env NODE_ENV=test jasmine"
+    "test": "cross-env NODE_ENV=dev jasmine"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",

@@ -17,14 +17,19 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(cors());
 
+
+app.use('/users', Users);
+app.use('/story', Stories);
+
 //Routes Endpoints
 app.get('/', function (req: Request, res: Response) {
     res.send('API Running!')
 })
 
-app.use('/users', Users);
-app.use('/story', Stories);
-
+// For invalid routes
+app.get('*', (req, res) => {
+    res.send('404! This is an invalid URL.');
+});
 
 app.listen(3000, function () {
     console.log(`starting app on: ${address}`)

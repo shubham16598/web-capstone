@@ -29,9 +29,9 @@ Users.get('/generatetoken', async (req: Request, res: Response) => {
 
 })
 
-Users.get('/all', Auth, async (req: Request, res: Response) => {
+Users.get('/all', (req: Request, res: Response) => {
     try {
-        const users = await userStore.all();
+        const users = userStore.all();
         res.json(users);
       } catch(err) {
         res.status(400)
