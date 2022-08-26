@@ -18,41 +18,57 @@ export class UserStore {
     }
 
     async create(username: Text, password: Text): Promise<User[]> {
-        let result;
-        if (username === undefined || password === undefined) {
-            throw new Error(`User not found`)
-        } else {
-            const newpassword = await bcrypt.hashSync(password, parseInt(`${process.env.SALTROUND}`));
-
-
-            result = await database.query(`INSERT INTO users (username, password) VALUES($1, $2) RETURNING *`,
-                [username, newpassword]);
+        try {
+            let result;
+            if (username === undefined || password === undefined) {
+                throw new Error(`User not found`)
+            } else {
+                const newpassword = await bcrypt.hashSync(password, parseInt(`${process.env.SALTROUND}`));
+                result = await database.query(`INSERT INTO users (username, password) VALUES($1, $2) RETURNING *`,
+                    [username, newpassword]);
+                return result.rows;
+            }
+        } catch (error) {
+            return [];
         }
-
-        return result.rows;
     }
 
-    async login(username: Text, password: Text): Promise<string> {
-        let result: string = '';
+    async login(username: Text, password: Text): Promise<Object> {
+        let result = { "token": '' };
         if (username === undefined || password === undefined) {
             throw new Error(`User not found`)
         } else {
             const user = await database.query(`SELECT * FROM users WHERE username = $1`, [username]);
-            console.log(user);
-            const verified = await bcrypt.compareSync(password, user.rows[0].password);
-            if (verified) {
-                const payload = {
-                    user: username,
-                };
-                await jwt.sign(
-                    payload,
-                    `${process.env.JWTSECRET}`,
-                    { expiresIn: 360000 },
-                    (err, token) => {
-                        if (err) throw err;
-                        result = token;
-                    }
-                );
+            try {
+                const verified = await bcrypt.compareSync(password, user.rows[0].password);
+                if (verified) {
+                    const payload = {
+                        user: username,
+                    };
+                    result.token = await jwt.sign(
+                        payload,
+                        `${process.env.JWTSECRET}`,
+                        { expiresIn: 360000 },
+                    );
+                }
+            } catch (error) {
+                return result;
+            }
+
+        }
+        return result;
+    }
+
+
+    async getUser(username: Text): Promise<Object> {
+        let result = { "credentials": { "createdAt": Date.now(), "email": "", "userId": "" } };
+        if (username === undefined) {
+            throw new Error(`User not found`)
+        } else {
+            const user = await database.query(`SELECT * FROM users WHERE username = $1`, [username]);
+            if (user.rows) {
+                result.credentials.email = user.rows[0].username;
+                result.credentials.userId = user.rows[0].id;
             }
 
         }
